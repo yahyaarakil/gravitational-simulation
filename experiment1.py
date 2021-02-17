@@ -36,11 +36,11 @@ view = View()
 world = view.WORLD
 
 # Setup
-x = Particle((0, -300, 0), mass=200)
-x.comps["Physics"].velocity = Vector(50, 0, 0)
+x = Particle((100, -300, 0), mass=200)
+# x.comps["Physics"].velocity = Vector(50, 0, 0)
 world.place_entity(x)
-y = Particle((400, -600, 0), mass=200)
-y.comps["Physics"].velocity = Vector(0, 50, 0)
+y = Particle((400, -500, 0), mass=200)
+# y.comps["Physics"].velocity = Vector(0, 50, 0)
 world.place_entity(y)
 
 delta_time = 0
@@ -48,5 +48,6 @@ delta_time = 0
 while view.running == True:
     start = time.time()
     view.main_loop(delta_time)
+    world.physics_suspended = view.physics_suspended
     world.simulate_physics(delta_time)
     delta_time = time.time() - start

@@ -7,8 +7,9 @@ from comps import *
 
 # Constants
 RED = (255, 0, 0)
-FADE_RED = (255, 0, 0, 50)
+FADE_RED = (255, 0, 0, 100)
 GREEN = (0, 255, 0)
+FADE_GREEN = (0, 255, 0, 200)
 BLUE = (0, 0, 255)
 screen_width = 800
 screen_height = 600
@@ -39,6 +40,7 @@ class View:
         # # init controlling variables
         self.running = True
         self.clock = pygame.time.Clock()
+        self.physics_suspended = True
 
     # Helper Fucntions
     def write_text(self, text, location):
@@ -50,11 +52,24 @@ class View:
     def drawCircle(self, color, location, radius):
         pygame.draw.circle(self.screen, color, location, radius)
 
+    def draw_circle_alpha(self, color, location, radius):
+        target_rect = pygame.Rect(location, (0, 0)).inflate((radius * 2, radius * 2))
+        shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+        pygame.draw.circle(shape_surf, color, (radius, radius), radius)
+        self.screen.blit(shape_surf, target_rect)
+
     def resolve_entity_position_to_screen(self, entity):
         x = entity.comps["Position"].x - self.x
         y = (entity.comps["Position"].y - self.y) * -1
-        if x > screen_width or y > screen_height or x < 0 or y < 0:
-            return None
+        # if x > screen_width or y > screen_height or x < 0 or y < 0:
+        #     return None
+        return (x, y)
+
+    def resolve_point_to_screen(self, point):
+        x = point.x - self.x
+        y = point.y - self.y * -1
+        # if x > screen_width or y > screen_height or x < 0 or y < 0:
+        #     return None
         return (x, y)
 
     def main_loop(self, delta_time):
@@ -80,6 +95,8 @@ class View:
                     self.view_scale += 0.1
                 if event.key == pygame.K_o:
                     self.view_scale -= 0.1
+                if event.key == pygame.K_p:
+                    self.physics_suspended = not self.physics_suspended
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_w:
                     self.moveto += Vector(0, -1, 0)
@@ -105,7 +122,7 @@ class View:
                 pos = self.resolve_entity_position_to_screen(entity)
                 if pos == None:
                     continue
-                self.drawCircle(RED, (pos[0], pos[1]), entity.comps["Physics"].mass * self.view_scale)
+                self.draw_circle_alpha(FADE_RED, (pos[0], pos[1]), entity.comps["Physics"].mass * self.view_scale)
 
         # Layer 2
         for entity in self.WORLD.entities:
@@ -113,7 +130,7 @@ class View:
                 pos = self.resolve_entity_position_to_screen(entity)
                 if pos == None:
                     continue
-                self.drawCircle(GREEN, (pos[0], pos[1]), entity.comps["Physics"].mass * self.view_scale / 2)
+                self.draw_circle_alpha(FADE_GREEN, (pos[0], pos[1]), entity.comps["Physics"].mass * self.view_scale / 2)
 
         # Layer 2
         for entity in self.WORLD.entities:
@@ -122,6 +139,8 @@ class View:
                 if pos == None:
                     continue
                 self.drawCircle(BLUE, (pos[0], pos[1]), 4 * self.view_scale)
+
+        # Directions
 
         # Layer 3
         for entity in self.WORLD.entities:
@@ -138,4 +157,4 @@ class View:
 
         # end rendering
         pygame.display.update()
-        self.clock.tick(120)
+        self.clock.tick(60)
