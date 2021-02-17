@@ -42,6 +42,9 @@ world.place_entity(x)
 y = Particle((400, -500, 0), mass=200)
 # y.comps["Physics"].velocity = Vector(0, 50, 0)
 world.place_entity(y)
+z = Particle((600, -200, 0), mass=200)
+# z.comps["Physics"].velocity = Vector(0, 50, 0)
+world.place_entity(z)
 
 delta_time = 0
 

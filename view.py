@@ -40,7 +40,7 @@ class View:
         # # init controlling variables
         self.running = True
         self.clock = pygame.time.Clock()
-        self.physics_suspended = True
+        self.physics_suspended = False
 
     # Helper Fucntions
     def write_text(self, text, location):

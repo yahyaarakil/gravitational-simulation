@@ -1,4 +1,4 @@
-PHYSICS_TICK_SIZE = 0.01
+PHYSICS_TICK_SIZE = 0.2
 
 class World:
     def __init__(self):

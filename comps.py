@@ -35,6 +35,12 @@ class Physics(Component):
         self.velocity *= 1
         # pass
 
+    def _gravity(self, entity, distance, invert = False):
+        if not invert:
+            return 5 * (self.mass * entity.mass) / (distance)**2
+        else:
+            return (distance)**2 / (self.mass * entity.mass * 5)
+
     def recalc(self):
         for entity in Physics.gravity_entities:
             if entity == self:
@@ -48,11 +54,44 @@ class Physics(Component):
                 culled_distance = self.mass
             else:
                 culled_distance = distance
-            gravity = 1 * (self.mass * entity.mass) / (culled_distance)**2
+            gravity = self._gravity(entity, culled_distance, False)
             if distance > (self.mass + entity.mass) / 2:
                 self.velocity -= (direction.normalize() * gravity)
             else:
                 self.velocity = (direction.normalize() * gravity)
+        self.apply_friction()
+        print(self.velocity)
+        # F = ma
+        # a = F/m
+        
+    def recalc_closest(self):
+        closest = Physics.gravity_entities[0]
+        if closest == self:
+            closest = Physics.gravity_entities[1]
+        for entity in Physics.gravity_entities:
+            if entity == self:
+                continue
+            if Vector.vector_from_points(self.position, entity.position).length() <\
+                Vector.vector_from_points(self.position, closest.position).length():
+                closest = entity
+        
+        entity = closest
+        self.entity = closest
+
+        direction = Vector.vector_from_points(entity.position, self.position)
+        distance = direction.length()
+        if distance > entity.mass + self.mass or distance < 2:
+            print("cont", distance)
+            return
+        if distance < self.mass:
+            culled_distance = self.mass
+        else:
+            culled_distance = distance
+        gravity = self._gravity(entity, culled_distance, True)
+        if distance > (self.mass + entity.mass) / 2:
+            self.velocity -= (direction.normalize() * gravity)
+        else:
+            self.velocity = (direction.normalize() * gravity)
         self.apply_friction()
         print(self.velocity)
         # F = ma
