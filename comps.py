@@ -32,7 +32,7 @@ class Physics(Component):
         self.velocity = Vector(0, 0, 0)
 
     def apply_friction(self):
-        self.velocity *= 0.99
+        self.velocity *= 1
         # pass
 
     def recalc(self):
@@ -41,15 +41,18 @@ class Physics(Component):
                 continue
             direction = Vector.vector_from_points(entity.position, self.position)
             distance = direction.length()
-            if distance > entity.mass or distance < 2:
+            if distance > entity.mass + self.mass or distance < 2:
                 print("cont", distance)
                 continue
-            if distance < 200:
-                culled_distance = 200
+            if distance < self.mass:
+                culled_distance = self.mass
             else:
                 culled_distance = distance
-            gravity = 10 * (self.mass * entity.mass) / (culled_distance)**2
-            self.velocity -= (direction.normalize() * gravity)
+            gravity = 1 * (self.mass * entity.mass) / (culled_distance)**2
+            if distance > (self.mass + entity.mass) / 2:
+                self.velocity -= (direction.normalize() * gravity)
+            else:
+                self.velocity = (direction.normalize() * gravity)
         self.apply_friction()
         print(self.velocity)
         # F = ma

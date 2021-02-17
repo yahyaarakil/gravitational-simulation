@@ -109,6 +109,14 @@ class View:
 
         # Layer 2
         for entity in self.WORLD.entities:
+            if "Physics" in entity.comps:
+                pos = self.resolve_entity_position_to_screen(entity)
+                if pos == None:
+                    continue
+                self.drawCircle(GREEN, (pos[0], pos[1]), entity.comps["Physics"].mass * self.view_scale / 2)
+
+        # Layer 2
+        for entity in self.WORLD.entities:
             if "Position" in entity.comps:
                 pos = self.resolve_entity_position_to_screen(entity)
                 if pos == None:
